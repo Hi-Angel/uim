@@ -526,9 +526,13 @@ modmask(char *name)
     return(mask);
 }
 
-#if defined(Q_WS_X11)
+#if defined(Q_WS_X11) || defined(Q_OS_UNIX)
 int
+#if QT_VERSION < 0x050000
 QUimInputContext::TransFileName(char *transname, const char *name, size_t len)
+#else
+QUimPlatformInputContext::TransFileName(char *transname, const char *name, size_t len)
+#endif
 {
     char *home = 0;
     char lcCompose[MAXPATHLEN];
@@ -574,7 +578,11 @@ QUimInputContext::TransFileName(char *transname, const char *name, size_t len)
 #endif
 
 const char *
+#if QT_VERSION < 0x050000
 QUimInputContext::get_encoding()
+#else
+QUimPlatformInputContext::get_encoding()
+#endif
 {
 #if 0
     // starting from Qt 4.2.0, QTextCodec::codecForLocale()->name()
@@ -598,7 +606,11 @@ QUimInputContext::get_encoding()
 }
 
 int
+#if QT_VERSION < 0x050000
 QUimInputContext::get_lang_region(char *locale, size_t len)
+#else
+QUimPlatformInputContext::get_lang_region(char *locale, size_t len)
+#endif
 {
     strlcpy(locale, setlocale(LC_CTYPE, 0), len);
     if (locale[0] == '\0') {
@@ -613,7 +625,11 @@ QUimInputContext::get_lang_region(char *locale, size_t len)
 }
 
 int
+#if QT_VERSION < 0x050000
 QUimInputContext::get_mb_string(char *buf, unsigned int ks)
+#else
+QUimPlatformInputContext::get_mb_string(char *buf, unsigned int ks)
+#endif
 {
     unsigned int ucs = KeySymToUcs4(ks);
     QString qs = QString(QChar(ucs));
@@ -630,7 +646,11 @@ static const unsigned AllMask = (ShiftMask | LockMask | ControlMask | Mod1Mask);
 #define SEQUENCE_MAX    10
 
 int
+#if QT_VERSION < 0x050000
 QUimInputContext::parse_compose_line(FILE *fp, char **tokenbuf, size_t *buflen)
+#else
+QUimPlatformInputContext::parse_compose_line(FILE *fp, char **tokenbuf, size_t *buflen)
+#endif
 {
     struct DefBuffer {
         unsigned modifier_mask;
@@ -834,7 +854,11 @@ error:
 }
 
 void
+#if QT_VERSION < 0x050000
 QUimInputContext::FreeComposeTree(DefTree *top)
+#else
+QUimPlatformInputContext::FreeComposeTree(DefTree *top)
+#endif
 {
     if (!top)
         return;
@@ -849,7 +873,11 @@ QUimInputContext::FreeComposeTree(DefTree *top)
 }
 
 void
+#if QT_VERSION < 0x050000
 QUimInputContext::ParseComposeStringFile(FILE *fp)
+#else
+QUimPlatformInputContext::ParseComposeStringFile(FILE *fp)
+#endif
 {
     char *tbp, *p[1];
     struct stat st;
@@ -868,7 +896,11 @@ QUimInputContext::ParseComposeStringFile(FILE *fp)
     }
 }
 
+#if QT_VERSION < 0x050000
 void QUimInputContext::create_compose_tree()
+#else
+void QUimPlatformInputContext::create_compose_tree()
+#endif
 {
     char *compose_env = getenv("XCOMPOSEFILE");
     char name[MAXPATHLEN];
@@ -908,7 +940,11 @@ void QUimInputContext::create_compose_tree()
     fclose(fp);
 }
 
+#if QT_VERSION < 0x050000
 int QUimInputContext::get_compose_filename(char *filename, size_t len)
+#else
+int QUimPlatformInputContext::get_compose_filename(char *filename, size_t len)
+#endif
 {
     char lang_region[BUFSIZ];
     int ret = get_lang_region(lang_region, sizeof(lang_region));

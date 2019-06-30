@@ -79,6 +79,7 @@ int main( int argc, char **argv )
     textdomain(PACKAGE);
     bind_textdomain_codeset(PACKAGE, "UTF-8"); // ensure code encoding is UTF8-
 
+    qputenv("__UIM_CANDWIN_CALLED", QByteArray("STARTED"));
     setenv("XMODIFIERS", "@im=none", 1);
     
     QApplication a( argc, argv );

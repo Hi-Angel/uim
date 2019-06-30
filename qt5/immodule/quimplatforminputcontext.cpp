@@ -49,6 +49,7 @@
 #include "qhelpermanager.h"
 #include "qtextutil.h"
 #include "quiminfomanager.h"
+#include "quiminputcontext_compose.h"
 
 static const char DEFAULT_SEPARATOR_STR[] = "|";
 
@@ -58,6 +59,9 @@ bool disableFocusedContext = false;
 QList<QUimPlatformInputContext*> contextList;
 
 QUimHelperManager *QUimPlatformInputContext::m_helperManager = 0;
+#if defined(Q_WS_X11) || defined(Q_OS_UNIX)
+DefTree *QUimPlatformInputContext::mTreeTop = 0;
+#endif
 
 static int unicodeToUKey(ushort c);
 
@@ -81,6 +85,11 @@ QUimPlatformInputContext::QUimPlatformInputContext(const char *imname)
 //    if (candwinIsActive)
 //	    createCandidateWindow();
 
+#if defined(Q_WS_X11) || defined(Q_OS_UNIX)
+    if ( !mTreeTop )
+        create_compose_tree();
+    mCompose = new Compose( mTreeTop, this );
+#endif
     m_textUtil = new QUimTextUtil(this);
 
     // read configuration
@@ -374,7 +383,7 @@ bool QUimPlatformInputContext::filterEvent(const QEvent *event)
     int notFiltered;
     if (type == QEvent::KeyPress) {
         notFiltered = uim_press_key(m_uc, key, modifier);
-#ifdef Q_WS_X11
+#if defined(Q_WS_X11) || defined(Q_OS_UNIX)
         if (notFiltered)
             return mCompose->handle_qkey(keyevent);
 #else
@@ -383,7 +392,7 @@ bool QUimPlatformInputContext::filterEvent(const QEvent *event)
 #endif
     } else if (type == QEvent::KeyRelease) {
         notFiltered = uim_release_key(m_uc, key, modifier);
-#ifdef Q_WS_X11
+#if defined(Q_WS_X11) || defined(Q_OS_UNIX)
         if (notFiltered)
             return mCompose->handle_qkey(keyevent);
 #else
